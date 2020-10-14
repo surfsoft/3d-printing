@@ -1,10 +1,10 @@
-drawerWidth = 100;
-drawerDepth = 300;
-dividerHeight = 80;
+drawerWidth = 530;
+drawerDepth = 440;
+dividerHeight = 60;
 dividerBaseWidth = 4;
 dividerTopWidth = 2;
 slotSpacing = 80;
-slotHeight = 30;
+slotHeight = 25;
 slotWidth = 2.5;
 
 defaultThickness = 1;
@@ -29,12 +29,12 @@ module dividerEndBase(debOuterWidth = 30,
     translate([(debInnerWidth + ((debOuterWidth - debInnerWidth) / 2)) / 2, debInnerWidth + ((debOuterWidth - debInnerWidth) / 2), debThickness / 2]) rotate([0, 0, zAngle]) translate([-base / 2, 0, 0]) cube([base, hypotenuse, debThickness], center = true);                          
 };
 
-module dividerEnd(deHeight = 10, deDepth = 10, deWidth = 30, deThickness = defaultThickness) {
+module verticalDividerEnd(deHeight = 10, deDepth = 10, deWidth = 30, deThickness = defaultThickness) {
     translate([0, 0, 0]) dividerEndBase();
     translate([0, (deThickness / 2), deHeight / 2]) cube([deWidth, deThickness, deHeight], center = true);
 };
 
-module dividerBody(dbLength, dbHeight, dbBaseWidth = dividerBaseWidth, dbTopWidth = dividerTopWidth, dbBaseHeight = 10) {
+module verticalDividerBody(dbLength, dbHeight, dbBaseWidth = dividerBaseWidth, dbTopWidth = dividerTopWidth, dbBaseHeight = 10) {
     
     translate([0, 0, dbBaseHeight / 2]) cube([dbBaseWidth, dbLength, dbBaseHeight], center = true);
     translate([0, 0, dbBaseHeight + ((dbHeight - dbBaseHeight) / 2)]) cube([dbTopWidth, dbLength, dbHeight - dbBaseHeight], center = true);
@@ -55,46 +55,112 @@ module dividerBody(dbLength, dbHeight, dbBaseWidth = dividerBaseWidth, dbTopWidt
 
 };
 
-module verticalDivider(vdLength = drawerDepth, vdHeight = dividerHeight, vdSlotSpacing = slotSpacing, vdSlotWidth = slotWidth, vdSlotHeight = slotHeight) {
+module verticalDivider(vdLength = drawerDepth, vdHeight = dividerHeight, vdSlotCount = 0, vdSlotOffset = 0, vdSlotSpacing = slotSpacing, vdSlotWidth = slotWidth, vdSlotHeight = slotHeight) {
     difference() {
         union() {
-            translate([0, - vdLength / 2, 0]) dividerEnd();
-            dividerBody(vdLength, vdHeight);
-            translate([0, vdLength / 2, 0]) rotate([0, 0, 180]) dividerEnd();
+            translate([0, - vdLength / 2, 0]) verticalDividerEnd();
+            verticalDividerBody(vdLength, vdHeight);
+            translate([0, vdLength / 2, 0]) rotate([0, 0, 180]) verticalDividerEnd();
         };
         union() {
-            slotCount = floor(vdLength / vdSlotSpacing) + 1;
-            initialOffset = - (vdLength / 2) + (vdLength - ((slotCount - 1) * vdSlotSpacing)) / 2;
-            for( slotNo = [ 0 : slotCount - 1]) {
-                translate([0, initialOffset + (slotNo * vdSlotSpacing), vdHeight - (vdSlotHeight / 2)]) cube([dividerBaseWidth, vdSlotWidth, vdSlotHeight], center = true);
+            for( slotNo = [ 0 : vdSlotCount - 1]) {
+                translate([0, (slotNo * vdSlotSpacing) + vdSlotOffset - (vdLength / 2), vdHeight - (vdSlotHeight / 2)]) cube([dividerBaseWidth, vdSlotWidth, vdSlotHeight], center = true);
             };
         };
     };
 };
 
+module horizontalDividerEnd(hdeThickness = defaultThickness, hdeWidth = 30, hdeHeight = 10) {
+    cube([hdeThickness, hdeWidth, hdeHeight], center = true);
+};
 
-module horizontalDivider(hdSlotCount, hdHeight = dividerHeight, hdWidth = dividerTopWidth, hdSlotSpacing = slotSpacing, hdSlotWidth = dividerBaseWidth, hdSlotHeight = dividerHeight - slotHeight + 1, hdEndThickness = defaultThickness, hdEndWidth = 30, hdEndHeight = 10) {
-    
-    length = (hdSlotSpacing * (hdSlotCount + 1)) + (hdSlotWidth * (hdSlotCount + 2)) + hdEndThickness;
-    
-    translate([- (length + hdEndThickness) / 2, 0, hdEndHeight / 2]) 
-      cube([hdEndThickness, hdEndWidth, hdEndHeight], center = true);
-    
-    translate([0, 0, hdHeight / 2]) difference() {
-        cube([length, hdWidth, hdHeight], center = true);
-        translate([0, 0, (hdHeight - hdSlotHeight) / 2]) union() {
-            translate([((hdSlotWidth + (hdEndThickness / 2)) / 2) - (length / 2), 0, 0]) cube([hdSlotWidth + (hdEndThickness / 2), hdSlotWidth, hdSlotHeight], center = true);
-            for( slotNo = [ 1 : hdSlotCount]) {
-                translate([(slotNo * (hdSlotSpacing + hdSlotWidth)) + (hdSlotWidth / 2) - (length / 2), 0, 0]) cube([hdSlotWidth, hdSlotWidth, hdSlotHeight], center = true);
-            };
-            translate([- ((hdSlotWidth + (hdEndThickness / 2)) / 2) + (length / 2), 0, 0]) cube([hdSlotWidth + (hdEndThickness / 2), hdSlotWidth, hdSlotHeight], center = true);
+module horizontalDividerBody(hdbLength, hdbWidth = dividerTopWidth, hdbHeight = dividerHeight, hdbTabWidth = dividerTopWidth, hdbTabHeight = slotHeight) {
+    difference() {
+        cube([hdbLength, hdbWidth, hdbHeight], center = true);    
+        union() {
+            translate([(-hdbLength + hdbTabWidth) / 2, 0, (hdbTabHeight + 1) / 2]) 
+              cube([hdbTabWidth, hdbWidth, hdbHeight - hdbTabHeight + 1.5], center = true);
+            translate([(hdbLength - hdbTabWidth) / 2, 0, (hdbTabHeight + 1) / 2]) 
+              cube([hdbTabWidth, hdbWidth, hdbHeight - hdbTabHeight + 1.5], center = true);
         };
     };
-    
-    translate([(length + hdEndThickness) / 2, 0, hdEndHeight / 2]) 
-      cube([hdEndThickness, hdEndWidth, hdEndHeight], center = true);
 };
 
 
-horizontalDivider(3);
-//verticalDivider();
+module horizontalDivider(hdLength = drawerWidth, hdSlotCount = 0, hdHeight = dividerHeight, hdWidth = dividerTopWidth, hdSlotSpacing = slotSpacing, hdSlotOffset = 0, hdSlotWidth = dividerBaseWidth, hdSlotHeight = dividerHeight - slotHeight + 1, hdEndThickness = defaultThickness, hdEndWidth = 30, hdEndHeight = 10, hdTopWidth = dividerTopWidth) {
+    
+    length = hdLength + hdWidth;
+    
+    translate([- (length + hdEndThickness) / 2, 0, hdEndHeight / 2]) horizontalDividerEnd();
+
+    translate([0, 0, hdHeight / 2]) 
+    difference() {
+        horizontalDividerBody(hdbLength = length);
+        union() {
+        if (hdSlotCount > 0) {
+            for( slotNo = [ 0 : hdSlotCount - 1]) {
+                translate([- (length / 2) + hdSlotOffset + (slotNo * hdSlotSpacing), 0, (hdHeight - hdSlotHeight) / 2]) 
+                  cube([hdSlotWidth, hdWidth, hdSlotHeight], center = true);
+            };
+        };
+    };
+    };
+    
+    translate([(length + hdEndThickness) / 2, 0, hdEndHeight / 2]) horizontalDividerEnd();
+};
+
+module assembledDesign() {
+translate([0, 220, 0]) {
+    translate ([0, 0, 0]) 
+      verticalDivider(vdSlotCount = 2, vdSlotOffset = 110, vdSlotSpacing = 80);
+    translate ([80, 95, 0]) 
+      verticalDivider(vdLength = 250);
+    translate ([160, 95, 0]) 
+      verticalDivider(vdLength = 250);
+    translate ([240, 55, 0]) 
+      verticalDivider(vdLength = 330, vdSlotCount = 2, vdSlotOffset = 80, vdSlotSpacing = 85);
+    translate ([410, 0, 0]) 
+      verticalDivider(vdSlotCount = 2, vdSlotOffset = 110, vdSlotSpacing = 165);
+    translate ([530, 0, 0]) 
+      verticalDivider(vdSlotCount = 0);
+};
+
+translate([265, 0, 0]) {
+    translate([205, 0, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 120);
+    translate([-60, 110, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 410, hdSlotCount = 1, hdSlotOffset = 240);
+    translate([-145, 190, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 240, hdSlotCount = 2, hdSlotOffset = 80, hdSlotSpacing = 80);
+    translate([60, 275, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 170);
+    translate([-145, 440, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 240, hdSlotCount = 2, hdSlotOffset = 80, hdSlotSpacing = 80);
+    translate([205, 440, dividerHeight]) rotate([180, 0, 0]) 
+      horizontalDivider(hdLength = 120);
+};
+};
+
+
+/*
+// 1
+verticalDivider(vdSlotCount = 2, vdSlotOffset = 110, vdSlotSpacing = 80);
+// 2
+verticalDivider(vdLength = 250);
+// 1
+verticalDivider(vdLength = 330, vdSlotCount = 2, vdSlotOffset = 80, vdSlotSpacing = 85);
+// 1
+verticalDivider(vdSlotCount = 2, vdSlotOffset = 110, vdSlotSpacing = 165);
+// 1
+verticalDivider(vdSlotCount = 0);
+// 2
+horizontalDivider(hdLength = 120);
+// 1
+horizontalDivider(hdLength = 410, hdSlotCount = 1, hdSlotOffset = 240);
+// 2
+horizontalDivider(hdLength = 240, hdSlotCount = 2, hdSlotOffset = 80, hdSlotSpacing = 80);
+// 1
+horizontalDivider(hdLength = 170);
+*/
+
+assembledDesign();
