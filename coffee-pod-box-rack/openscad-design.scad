@@ -48,9 +48,9 @@ module frontFrame() {
 module bottomFrame() {
 
     cube([9.5, 200, 2], center = true);
-    translate([boxX + slotSeparator, 0, 0]) cube([9.5, 200, 2], center = true);
-    translate([(boxX + slotSeparator) * 2, 0, 0]) cube([9.5, 200, 2], center = true);
-    translate([(boxX + slotSeparator) * 3, 0, 0]) cube([9.5, 200, 2], center = true);
+    translate([boxX + slotSeparator, 0, 0]) cube([9.5, 210, 2], center = true);
+    translate([(boxX + slotSeparator) * 2, 0, 0]) cube([9.5, 210, 2], center = true);
+    translate([(boxX + slotSeparator) * 3, 0, 0]) cube([9.5, 210, 2], center = true);
 
     translate([((boxX + slotSeparator) * 3) / 2, -87.5, 0.5]) cube([ 10 + (boxX + slotSeparator) * 3, 5, 3], center = true);
     translate([((boxX + slotSeparator) * 3) / 2, 87.5, 0.5]) cube([ 10 + (boxX + slotSeparator) * 3, 5, 3], center = true);
