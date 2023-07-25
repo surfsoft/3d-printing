@@ -1,10 +1,10 @@
-$fn=90;
+$fn=16;
 
-module post(postInnerDiameter = 6, postHeight = 7, frameHeight = 2) {
+module post(postInnerDiameter = 7, postHeight = 7, frameHeight = 2) {
 
     postTopHeight = 2;
     screwDiameter = 4;
-    postOuterDiameter = postInnerDiameter + 4;
+    postOuterDiameter = postInnerDiameter + 3.6;
 
     difference() {
         union() {
@@ -50,13 +50,11 @@ module enclosureMount() {
             translate([0, (postYSpacing - fraweWidth)/ 2,  -(postHeight - frameHeight) / 2])
               cube([postXSpacing - postOuterDiameter, fraweWidth, frameHeight], center=true);
 
-            translate([-(postXSpacing - fraweWidth)/ 2, 0,  -(postHeight - frameHeight) / 2])
+            translate([-((postXSpacing - fraweWidth)/ 2) + 0.5, 0,  -(postHeight - frameHeight) / 2])
               cube([fraweWidth, postYSpacing - postOuterDiameter, frameHeight], center=true);
-            translate([(postXSpacing - fraweWidth)/ 2, 0,  -(postHeight - frameHeight) / 2])
+            translate([((postXSpacing - fraweWidth)/ 2) - 1, 0,  -(postHeight - frameHeight) / 2])
               cube([fraweWidth, postYSpacing - postOuterDiameter, frameHeight], center=true);
             
-            //translate([0, 0, -(postHeight - frameHeight) / 2])
-             // cube([postXSpacing - postOuterDiameter, postYSpacing - postOuterDiameter, frameHeight], center=true);
         }
         translate([0, 1, -(postHeight - frameHeight) / 2])
           cube([windowX, windowY, frameHeight], center=true);
@@ -87,24 +85,16 @@ module moduleMount() {
     viewableBorderRight = screenBorderRight + 8;
     controlRightMargin = 10;
     resetButtonBottomMargin = 7;
-    resetBodyHeight = 4.5;
-    resetBodyDiameter = 10;
-    resetButtonHeight = moduleBorderHeight - pcbHeight - resetBodyHeight;
-    resetButtonDiameter = 4.5;
-    controlDialBottomMargin = 25;
+    resetButtonDiameter = 5.5;
+    controlDialBottomMargin = 27;
     controlDialDiameter = 8;
-    controlDialBaseDiameter = 18;
-    controlDialBaseHeight = 6.2;
-    speakerBottomMargin = 43;
-    speakerDiameter = 12;
-    speakerHeight = 5.5;
     screwHoleXCentre = 104;
     screwHoleYCentre = 50;    
-    screwHoleDiameter = 3;
+    screwHoleDiameter = 3.5;
     screwHoleHeight = moduleBorderHeight - pcbHeight - 2;
 
-    translate([((moduleXSize + (moduleBorderWidth * 2)) / 2) + 1, 0, 0])
-      cube([2, moduleYSize + (moduleBorderWidth * 2), moduleBorderHeight], center=true);
+    translate([((moduleXSize + (moduleBorderWidth * 2)) / 2) + 1, 0, -1      ])
+      cube([2, moduleYSize + (moduleBorderWidth * 2), moduleBorderHeight - 2], center=true);
       
     difference() {
         cube([moduleXSize + (moduleBorderWidth * 2), moduleYSize + (moduleBorderWidth * 2), moduleBorderHeight], center=true);
@@ -119,7 +109,6 @@ module moduleMount() {
         
         // Display viewable area
         translate([-(viewableBorderRight - viewableBorderLeft) / 2, 0, -(moduleBorderHeight - viewableHeight) / 2])
-        translate([0, 0, 0]) 
           cube([viewableXSize, viewableYSize, viewableHeight], center=true);
             
 
@@ -127,22 +116,10 @@ module moduleMount() {
         translate([(moduleXSize / 2) -  controlRightMargin, (moduleYSize / 2) - resetButtonBottomMargin, 0])
           cylinder(d=resetButtonDiameter, h=moduleBorderHeight, center=true);
 
-        // Reset button base
-        translate([(moduleXSize / 2) -  controlRightMargin, (moduleYSize / 2) - resetButtonBottomMargin, ((moduleBorderHeight - resetBodyHeight) / 2) - pcbHeight])
-          cylinder(d=resetBodyDiameter, h=resetBodyHeight, center=true);
-
         // Control dial
         translate([(moduleXSize / 2) -  controlRightMargin, (moduleYSize / 2) - controlDialBottomMargin, 0])
           cylinder(d=controlDialDiameter, h=moduleBorderHeight, center=true);
-
-        // Control dial base
-        translate([(moduleXSize / 2) -  controlRightMargin, (moduleYSize / 2) - controlDialBottomMargin, ((moduleBorderHeight - controlDialBaseHeight) / 2) - pcbHeight])
-          cylinder(d=controlDialBaseDiameter, h=controlDialBaseHeight, center=true);
         
-        // Speaker void
-        translate([(moduleXSize / 2) -  controlRightMargin, (moduleYSize / 2) - speakerBottomMargin, ((moduleBorderHeight - speakerHeight) / 2) - pcbHeight])
-          cylinder(d=speakerDiameter, h=speakerHeight, center=true);
-
         // Screw holes
         for (x = [ -screwHoleXCentre / 2, screwHoleXCentre, screwHoleXCentre / 2]) {
             for (y = [ -screwHoleYCentre / 2, screwHoleYCentre, screwHoleYCentre / 2]) {
@@ -151,6 +128,16 @@ module moduleMount() {
             }
         }
         
+        // Remove unneccesary material
+        translate([42, 0, 0.3])
+          cube([13, screenYSize, screenHeight], center=true);
+        
+        translate([51.5, 0, 0.3])
+          cube([7, screenYSize - 12, screenHeight], center=true);
+        translate([-51.5, 0, 0.3])
+          cube([7, screenYSize - 12, screenHeight], center=true);
+        translate([0, 0, 3.5])
+          cube([moduleXSize + (moduleBorderWidth * 2), moduleYSize + (moduleBorderWidth * 2), 2], center=true);
         
     }
     
@@ -158,14 +145,3 @@ module moduleMount() {
 
 enclosureMount();
 translate([-1.25, 0, 1]) moduleMount();
-
-
-
-
-
-
-
-
-
-
-
